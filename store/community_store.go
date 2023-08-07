@@ -34,6 +34,7 @@ func (e EntCommunityStore) Find(q map[string]string) ([]*ent.Community, error) {
 				WithAuthor(userQ).
 				WithContent(contentQ).
 				WithComments(commentsQ).
+				WithCommunity(commentWithCommunityQ).
 				WithAttachments().
 				WithTags().
 				WithBookmarks().
