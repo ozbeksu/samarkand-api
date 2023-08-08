@@ -11,6 +11,8 @@ import (
 type UserStore interface {
 	Find(map[string]string) ([]*ent.User, error)
 	FindOne(map[string]string) (*ent.User, error)
+	FindOneWithProfile(map[string]string, map[string]string) (*ent.User, error)
+	FindOneWithMessages(map[string]string, map[string]string) (*ent.User, error)
 	FindOneWithPosts(map[string]string, map[string]string) (*ent.User, error)
 	FindOneWithTreads(map[string]string, map[string]string) (*ent.User, error)
 	FindOneWithComments(map[string]string, map[string]string) (*ent.User, error)
@@ -49,7 +51,7 @@ func (s EntUserStore) Find(q map[string]string) ([]*ent.User, error) {
 }
 
 func (s EntUserStore) FindOne(q map[string]string) (*ent.User, error) {
-	tx := s.client.User.Query().WithProfile(profileQ)
+	tx := s.client.User.Query()
 
 	email, ok := q["email"]
 	if ok {
@@ -69,10 +71,34 @@ func (s EntUserStore) FindOne(q map[string]string) (*ent.User, error) {
 	return u, nil
 }
 
-func (s EntUserStore) FindOneWithPosts(w map[string]string, q map[string]string) (*ent.User, error) {
+func (s EntUserStore) FindOneWithProfile(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
 		WithProfile(profileQ).
+		WithFollowers(userQ).
+		WithFollowing(userQ).
+		First(s.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
+}
+func (s EntUserStore) FindOneWithMessages(w map[string]string, q map[string]string) (*ent.User, error) {
+	u, err := s.client.User.Query().
+		Where(user.Username(w["username"])).
+		WithMessages(messageWithSenderQ).
+		First(s.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
+}
+
+func (s EntUserStore) FindOneWithPosts(w map[string]string, q map[string]string) (*ent.User, error) {
+	u, err := s.client.User.Query().
+		Where(user.Username(w["username"])).
 		WithComments(commentWithoutParent, commentWithoutCommunity, commentWithPaginatedQ(q)).
 		First(s.ctx)
 	if err != nil {
@@ -85,7 +111,6 @@ func (s EntUserStore) FindOneWithPosts(w map[string]string, q map[string]string)
 func (s EntUserStore) FindOneWithTreads(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithProfile(profileQ).
 		WithComments(commentWithoutParent, commentWithCommunity, commentWithPaginatedQ(q)).
 		First(s.ctx)
 	if err != nil {
@@ -98,7 +123,6 @@ func (s EntUserStore) FindOneWithTreads(w map[string]string, q map[string]string
 func (s EntUserStore) FindOneWithComments(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithProfile(profileQ).
 		WithComments(commentWithParent, commentWithCommunity, commentWithPaginatedQ(q)).
 		First(s.ctx)
 	if err != nil {
@@ -111,7 +135,6 @@ func (s EntUserStore) FindOneWithComments(w map[string]string, q map[string]stri
 func (s EntUserStore) FindOneWithMedia(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithProfile(profileQ).
 		WithAttachments().
 		First(s.ctx)
 	if err != nil {
@@ -124,8 +147,7 @@ func (s EntUserStore) FindOneWithMedia(w map[string]string, q map[string]string)
 func (s EntUserStore) FindOneWithBookmark(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithProfile(profileQ).
-		WithComments(commentWithBookmarked, commentWithPaginatedQ(q)).
+		WithBookmarks(bookmarkWithCommentQ).
 		First(s.ctx)
 	if err != nil {
 		return nil, err
@@ -137,8 +159,7 @@ func (s EntUserStore) FindOneWithBookmark(w map[string]string, q map[string]stri
 func (s EntUserStore) FindOneWithUpVoted(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithProfile(profileQ).
-		WithComments(commentWithUpVotes, commentWithPaginatedQ(q)).
+		WithVotes(voteUpVoted, voteWithCommentQ).
 		First(s.ctx)
 	if err != nil {
 		return nil, err
@@ -150,8 +171,7 @@ func (s EntUserStore) FindOneWithUpVoted(w map[string]string, q map[string]strin
 func (s EntUserStore) FindOneWithDownVoted(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithProfile(profileQ).
-		WithComments(commentWithDownVotes, commentWithPaginatedQ(q)).
+		WithVotes(voteDownVoted, voteWithCommentQ).
 		First(s.ctx)
 	if err != nil {
 		return nil, err

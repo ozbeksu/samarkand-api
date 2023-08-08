@@ -19,11 +19,31 @@ func profileQ(q *ent.ProfileQuery) {
 		WithCover(mediaQ)
 }
 
+func followQ(q *ent.UserQuery) {
+	q.
+		Select("id")
+}
+
+func messageWithSenderQ(q *ent.MessageQuery) {
+	q.
+		WithSender(userQ)
+}
+
 func communityQ(q *ent.CommunityQuery) {
 	q.
 		WithAvatar(mediaQ).
 		WithCover(mediaQ).
 		WithTopics()
+}
+
+func bookmarkWithCommentQ(q *ent.BookmarkQuery) {
+	q.
+		WithComment(commentsQ)
+}
+
+func voteWithCommentQ(q *ent.VoteQuery) {
+	q.
+		WithComment(commentsQ)
 }
 
 func commentWithCommunityQ(q *ent.CommunityQuery) {

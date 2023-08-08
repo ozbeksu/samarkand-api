@@ -55,6 +55,16 @@ func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
 	return ResponseOk(u, c)
 }
 
+func (h *UserHandler) HandleGetUserWithMessages(c *fiber.Ctx) error {
+	ps := map[string]string{"username": c.Params("username")}
+	u, err := h.store.User.FindOneWithMessages(ps, c.Queries())
+	if err != nil {
+		return NotFound(c)
+	}
+
+	return ResponseOk(u, c)
+}
+
 func (h *UserHandler) HandleGetUserWithPosts(c *fiber.Ctx) error {
 	ps := map[string]string{"username": c.Params("username")}
 	u, err := h.store.User.FindOneWithPosts(ps, c.Queries())
@@ -118,6 +128,16 @@ func (h *UserHandler) HandleGetUserWithUpVoted(c *fiber.Ctx) error {
 func (h *UserHandler) HandleGetUserWithDownVoted(c *fiber.Ctx) error {
 	ps := map[string]string{"username": c.Params("username")}
 	u, err := h.store.User.FindOneWithDownVoted(ps, c.Queries())
+	if err != nil {
+		return NotFound(c)
+	}
+
+	return ResponseOk(u, c)
+}
+
+func (h *UserHandler) HandleGetUserWithProfile(c *fiber.Ctx) error {
+	ps := map[string]string{"username": c.Params("username")}
+	u, err := h.store.User.FindOneWithProfile(ps, c.Queries())
 	if err != nil {
 		return NotFound(c)
 	}

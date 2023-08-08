@@ -60,13 +60,16 @@ func main() {
 
 	// users handlers
 	apiV1.Post("/users", userHandler.HandlePostUsers)
+	apiV1.Get("/users/:username/profile", userHandler.HandleGetUserWithProfile)
 	apiV1.Get("/users/:username/posts", userHandler.HandleGetUserWithPosts)
 	apiV1.Get("/users/:username/treads", userHandler.HandleGetUserWithTreads)
 	apiV1.Get("/users/:username/comments", userHandler.HandleGetUserWithComments)
+	apiV1.Get("/users/:username/messages", userHandler.HandleGetUserWithMessages)
 	apiV1.Get("/users/:username/media", userHandler.HandleGetUserWithMedia)
 	apiV1.Get("/users/:username/bookmarked", userHandler.HandleGetUserWithBookmark)
 	apiV1.Get("/users/:username/up-voted", userHandler.HandleGetUserWithUpVoted)
 	apiV1.Get("/users/:username/down-voted", userHandler.HandleGetUserWithDownVoted)
+	apiV1.Get("/users/:username", userHandler.HandleGetUser)
 	apiV1.Get("/users", userHandler.HandleGetUsers)
 
 	// tags handlers
