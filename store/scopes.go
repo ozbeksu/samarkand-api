@@ -5,6 +5,7 @@ import (
 	"github.com/ozbeksu/samarkand-api/ent/bookmark"
 	"github.com/ozbeksu/samarkand-api/ent/comment"
 	"github.com/ozbeksu/samarkand-api/ent/community"
+	"github.com/ozbeksu/samarkand-api/ent/message"
 	"github.com/ozbeksu/samarkand-api/ent/vote"
 )
 
@@ -31,26 +32,34 @@ func followQ(q *ent.UserQuery) {
 		Select("id")
 }
 
-func messageSQ(q *ent.MessageSenderQuery) {
-	q.
-		WithMessage(func(query *ent.MessageQuery) {
-			query.WithRecipients(func(recipientQuery *ent.MessageRecipientQuery) {
-				recipientQuery.
-					WithCommunity(communityQ).
-					WithUser(userQ)
+func messageSQ(context string) func(query *ent.MessageSenderQuery) {
+	return func(q *ent.MessageSenderQuery) {
+		q.
+			WithMessage(func(query *ent.MessageQuery) {
+				query.
+					Where(message.ContextEQ(message.Context(context))).
+					WithRecipients(func(recipientQuery *ent.MessageRecipientQuery) {
+						recipientQuery.
+							WithCommunity(communityQ).
+							WithUser(userQ)
+					})
 			})
-		})
+	}
 }
 
-func messageRQ(q *ent.MessageRecipientQuery) {
-	q.
-		WithMessage(func(query *ent.MessageQuery) {
-			query.WithSender(func(senderQuery *ent.MessageSenderQuery) {
-				senderQuery.
-					WithCommunity(communityQ).
-					WithUser(userQ)
+func messageRQ(context string) func(query *ent.MessageRecipientQuery) {
+	return func(q *ent.MessageRecipientQuery) {
+		q.
+			WithMessage(func(query *ent.MessageQuery) {
+				query.
+					Where(message.ContextEQ(message.Context(context))).
+					WithSender(func(senderQuery *ent.MessageSenderQuery) {
+						senderQuery.
+							WithCommunity(communityQ).
+							WithUser(userQ)
+					})
 			})
-		})
+	}
 }
 
 func communityQ(q *ent.CommunityQuery) {

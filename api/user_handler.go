@@ -55,8 +55,18 @@ func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
 	return ResponseOk(u, c)
 }
 
+func (h *UserHandler) HandleGetUserWithChats(c *fiber.Ctx) error {
+	ps := map[string]string{"username": c.Params("username"), "connection": c.Params("connection"), "with": "user"}
+	m, err := h.store.User.FindOneWithChats(ps, c.Queries())
+	if err != nil {
+		return NotFound(c)
+	}
+
+	return ResponseOk(m, c)
+}
+
 func (h *UserHandler) HandleGetUserWithMessages(c *fiber.Ctx) error {
-	ps := map[string]string{"username": c.Params("username")}
+	ps := map[string]string{"username": c.Params("username"), "context": c.Params("context")}
 	u, err := h.store.User.FindOneWithMessages(ps, c.Queries())
 	if err != nil {
 		return NotFound(c)

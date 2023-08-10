@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"time"
 )
 
 // MessageRecipient holds the schema definition for the MessageRecipient entity.
@@ -14,13 +15,14 @@ type MessageRecipient struct {
 // Fields of the MessageRecipient.
 func (MessageRecipient) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("status").Values("new", "read", "unread").Default("new"),
-		field.Bool("archived").Default(false),
-		field.Bool("deleted").Default(false),
 		field.Int("message_id").Optional(),
 		field.Int("user_id").Optional(),
 		field.Int("group_id").Optional(),
 		field.Int("community_id").Optional(),
+		field.Bool("archived").Default(false),
+		field.Bool("deleted").Default(false),
+		field.Enum("status").Values("new", "read", "unread").Default("new"),
+		field.Time("read_at").Default(time.Now),
 	}
 }
 

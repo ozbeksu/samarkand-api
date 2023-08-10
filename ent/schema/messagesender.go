@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"time"
 )
 
 // MessageSender holds the schema definition for the MessageSender entity.
@@ -14,11 +15,12 @@ type MessageSender struct {
 // Fields of the MessageSender.
 func (MessageSender) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("sender_type").Values("user", "group", "community"),
 		field.Int("message_id").Optional(),
 		field.Int("user_id").Optional(),
 		field.Int("group_id").Optional(),
 		field.Int("community_id").Optional(),
+		field.Enum("type").Values("user", "group", "community"),
+		field.Time("sent_at").Default(time.Now),
 	}
 }
 

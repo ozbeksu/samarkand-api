@@ -9,7 +9,7 @@ func createAdmin(aID, cID int) *ent.User {
 	pass, _ := types.HashPassword("secret")
 	return db.User.Create().
 		SetUsername("admin").
-		SetEmail("admin@samarkand-api.com").
+		SetEmail("admin@samarkand.com").
 		SetPassword(pass).
 		SetActive(true).
 		AddAttachmentIDs(aID, cID).

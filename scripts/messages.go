@@ -11,26 +11,36 @@ func createMessage() *ent.MessageCreate {
 	t := faker.LoremIpsumParagraph(1, 1, 6, "")
 	s := slug.Make(strings.ToLower(t))
 	c := faker.LoremIpsumParagraph(2, 5, 10, "<br/>\n")
-	d := getRandDate()
 
 	return db.Message.Create().
 		SetSubject(t).
 		SetSlug(s).
-		SetContent(c).
-		SetSentAt(d)
+		SetContent(c)
 }
 
-func createMessageSender(mID, communityCount int) *ent.MessageSenderCreate {
-	return db.MessageSender.Create().
+func createMessageSender(mID, userCount, communityCount int) *ent.MessageSenderCreate {
+	d := getRandDate()
+	tx := db.MessageSender.Create().
 		SetMessageID(mID).
-		SetSenderType(messagesender.SenderTypeCommunity).
-		SetCommunityID(getRandIntInRange(1, communityCount))
+		SetSentAt(d)
+
+	if getRandBool() {
+		tx = tx.SetUserID(getRandIntInRange(1, userCount)).
+			SetType(messagesender.TypeUser)
+	} else {
+		tx = tx.SetCommunityID(getRandIntInRange(1, communityCount)).
+			SetType(messagesender.TypeCommunity)
+	}
+
+	return tx
 }
 
 func createMessageRecipient(mID, userCount int) *ent.MessageRecipientCreate {
+	d := getRandDate()
 	return db.MessageRecipient.Create().
 		SetMessageID(mID).
-		SetUserID(getRandIntInRange(1, userCount))
+		SetUserID(getRandIntInRange(1, userCount)).
+		SetReadAt(d)
 }
 
 func makeMessages(n, userCount, communityCount int) []*ent.Message {
@@ -42,7 +52,7 @@ func makeMessages(n, userCount, communityCount int) []*ent.Message {
 
 	msBulk := make([]*ent.MessageSenderCreate, n)
 	for i := 0; i < n; i++ {
-		msBulk[i] = createMessageSender(i+1, communityCount)
+		msBulk[i] = createMessageSender(i+1, userCount, communityCount)
 	}
 	db.MessageSender.CreateBulk(msBulk...).SaveX(ctx)
 

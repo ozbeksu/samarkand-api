@@ -4,6 +4,9 @@ import (
 	"context"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ozbeksu/samarkand-api/ent"
+	"github.com/ozbeksu/samarkand-api/ent/message"
+	"github.com/ozbeksu/samarkand-api/ent/messagerecipient"
+	"github.com/ozbeksu/samarkand-api/ent/messagesender"
 	"github.com/ozbeksu/samarkand-api/ent/user"
 	"github.com/ozbeksu/samarkand-api/types"
 )
@@ -12,6 +15,7 @@ type UserStore interface {
 	Find(map[string]string) ([]*ent.User, error)
 	FindOne(map[string]string) (*ent.User, error)
 	FindOneWithProfile(map[string]string, map[string]string) (*ent.User, error)
+	FindOneWithChats(map[string]string, map[string]string) (*map[string]any, error)
 	FindOneWithMessages(map[string]string, map[string]string) (*ent.User, error)
 	FindOneWithPosts(map[string]string, map[string]string) (*ent.User, error)
 	FindOneWithTreads(map[string]string, map[string]string) (*ent.User, error)
@@ -84,11 +88,45 @@ func (s EntUserStore) FindOneWithProfile(w map[string]string, q map[string]strin
 
 	return u, nil
 }
+
+func (s EntUserStore) FindOneWithChats(w map[string]string, q map[string]string) (*map[string]any, error) {
+	u, err := s.client.User.Query().
+		Select("id").
+		Where(user.Username(w["username"])).
+		First(s.ctx)
+	if err != nil {
+		return nil, err
+	}
+	c, err := s.client.User.Query().
+		Select("id").
+		Where(user.Username(w["connection"])).
+		First(s.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sent, _ := s.client.Message.Query().
+		Where(message.ContextEQ(message.ContextChat)).
+		Where(message.HasSenderWith(messagesender.UserIDEQ(u.ID))).
+		Where(message.HasRecipientsWith(messagerecipient.UserIDEQ(c.ID))).
+		WithSender(func(query *ent.MessageSenderQuery) { query.WithUser(userQ) }).
+		All(s.ctx)
+
+	received, _ := s.client.Message.Query().
+		Where(message.ContextEQ(message.ContextChat)).
+		Where(message.HasSenderWith(messagesender.UserIDEQ(c.ID))).
+		Where(message.HasRecipientsWith(messagerecipient.UserIDEQ(u.ID))).
+		WithSender(func(query *ent.MessageSenderQuery) { query.WithUser(userQ) }).
+		All(s.ctx)
+
+	return &map[string]any{"sent": sent, "received": received}, nil
+}
+
 func (s EntUserStore) FindOneWithMessages(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithSentMessages(messageSQ).
-		WithReceivedMessages(messageRQ).
+		WithSentMessages(messageSQ(w["context"])).
+		WithReceivedMessages(messageRQ(w["context"])).
 		First(s.ctx)
 	if err != nil {
 		return nil, err
