@@ -63,7 +63,7 @@ func (s EntUserStore) FindOne(q map[string]string) (*ent.User, error) {
 		tx.Where(user.Username(username))
 	}
 
-	u, err := tx.First(s.ctx)
+	u, err := tx.WithProfile(avatarQ).First(s.ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,8 @@ func (s EntUserStore) FindOneWithProfile(w map[string]string, q map[string]strin
 func (s EntUserStore) FindOneWithMessages(w map[string]string, q map[string]string) (*ent.User, error) {
 	u, err := s.client.User.Query().
 		Where(user.Username(w["username"])).
-		WithMessages(messageWithSenderQ).
+		WithSentMessages(messageSQ).
+		WithReceivedMessages(messageRQ).
 		First(s.ctx)
 	if err != nil {
 		return nil, err

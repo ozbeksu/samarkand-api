@@ -4,12 +4,18 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"time"
 )
 
 // Vote holds the schema definition for the Vote entity.
 type Vote struct {
 	ent.Schema
+}
+
+// Mixin of the Vote.
+func (Vote) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
 }
 
 // Fields of the Vote.
@@ -19,8 +25,6 @@ func (Vote) Fields() []ent.Field {
 		field.Bool("down_vote").Default(false),
 		field.Int("user_id"),
 		field.Int("comment_id"),
-		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 

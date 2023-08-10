@@ -3,12 +3,18 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
-	"time"
 )
 
 // Activity holds the schema definition for the Activity entity.
 type Activity struct {
 	ent.Schema
+}
+
+// Mixin of the User.
+func (Activity) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
 }
 
 // Fields of the Activity.
@@ -21,8 +27,6 @@ func (Activity) Fields() []ent.Field {
 		field.String("subject_id").Optional(),
 		field.String("subject_type").Optional(),
 		field.JSON("data", map[string]any{}),
-		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 

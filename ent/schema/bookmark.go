@@ -4,12 +4,18 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"time"
 )
 
 // Bookmark holds the schema definition for the Bookmark entity.
 type Bookmark struct {
 	ent.Schema
+}
+
+// Mixin of the Bookmark.
+func (Bookmark) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
 }
 
 // Fields of the Bookmark.
@@ -18,8 +24,6 @@ func (Bookmark) Fields() []ent.Field {
 		field.Bool("saved").Default(false),
 		field.Int("user_id"),
 		field.Int("comment_id"),
-		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 

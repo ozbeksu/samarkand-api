@@ -13,6 +13,13 @@ func userQ(q *ent.UserQuery) {
 		WithProfile(profileQ)
 }
 
+func avatarQ(q *ent.ProfileQuery) {
+	q.
+		WithAvatar(func(query *ent.AttachmentQuery) {
+			query.Select("url")
+		})
+}
+
 func profileQ(q *ent.ProfileQuery) {
 	q.
 		WithAvatar(mediaQ).
@@ -24,9 +31,26 @@ func followQ(q *ent.UserQuery) {
 		Select("id")
 }
 
-func messageWithSenderQ(q *ent.MessageQuery) {
+func messageSQ(q *ent.MessageSenderQuery) {
 	q.
-		WithSender(userQ)
+		WithMessage(func(query *ent.MessageQuery) {
+			query.WithRecipients(func(recipientQuery *ent.MessageRecipientQuery) {
+				recipientQuery.
+					WithCommunity(communityQ).
+					WithUser(userQ)
+			})
+		})
+}
+
+func messageRQ(q *ent.MessageRecipientQuery) {
+	q.
+		WithMessage(func(query *ent.MessageQuery) {
+			query.WithSender(func(senderQuery *ent.MessageSenderQuery) {
+				senderQuery.
+					WithCommunity(communityQ).
+					WithUser(userQ)
+			})
+		})
 }
 
 func communityQ(q *ent.CommunityQuery) {

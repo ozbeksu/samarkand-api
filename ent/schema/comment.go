@@ -5,12 +5,18 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/ozbeksu/samarkand-api/utils"
-	"time"
 )
 
 // Comment holds the schema definition for the Comment entity.
 type Comment struct {
 	ent.Schema
+}
+
+// Mixin of the Comment.
+func (Comment) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
 }
 
 // Fields of the Comment.
@@ -26,8 +32,6 @@ func (Comment) Fields() []ent.Field {
 		field.Int("up_votes").Default(0),
 		field.Int("down_votes").Default(0),
 		field.Bool("is_moderated").Default(false),
-		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 

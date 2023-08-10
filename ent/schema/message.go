@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/ozbeksu/samarkand-api/utils"
 	"time"
 )
 
@@ -15,19 +16,20 @@ type Message struct {
 // Fields of the Message.
 func (Message) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("slug").DefaultFunc(func() string { return utils.RandStringBytes(12) }),
 		field.String("subject").Optional(),
-		field.String("body"),
-		field.Int("sender_id"),
-		field.Int("receiver_id"),
+		field.Enum("type").Values("text", "media", "link").Default("text"),
+		field.String("content"),
+		field.Bool("is_deleted").Default(false),
 		field.Time("sent_at").Default(time.Now),
+		field.Time("read_at").Default(time.Now),
 	}
 }
 
 // Edges of the Message.
 func (Message) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("sender", User.Type).Unique().Required().Field("sender_id"),
-		edge.To("receiver", User.Type).Unique().Required().Field("receiver_id"),
-		edge.From("users", User.Type).Ref("messages"),
+		edge.To("sender", MessageSender.Type).Unique(),
+		edge.To("recipients", MessageRecipient.Type),
 	}
 }

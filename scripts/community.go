@@ -7,12 +7,12 @@ import (
 
 func createCommunity(topicCount, memberCount int) *ent.CommunityCreate {
 	t := faker.LoremIpsumSentence(2)
-	d := faker.LoremIpsumParagraph(2, 2, 5, "<br/>\n")
+	d := faker.LoremIpsumParagraph(2, 5, 10, "<br/>\n")
 	creatorID := getRandIntInRange(1, memberCount)
 	topicIDs := []int{getRandIntInRange(1, topicCount), getRandIntInRange(1, topicCount)}
 	memberIDs := []int{getRandIntInRange(1, memberCount), getRandIntInRange(1, memberCount), getRandIntInRange(1, memberCount)}
 	modID := getRandIntInRange(1, memberCount)
-	a := createImage(getRandIntInRange(1, 10), "communities", "svg", 64, 64).SaveX(ctx)
+	a := createImage(getRandIntInRange(1, 10), "communities", "jpg", 256, 256).SaveX(ctx)
 	c := createImage(getRandIntInRange(1, 10), "covers", "jpg", 800, 392).SaveX(ctx)
 
 	return db.Community.Create().

@@ -14,13 +14,17 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ozbeksu/samarkand-api/ent/activity"
 	"github.com/ozbeksu/samarkand-api/ent/attachment"
+	"github.com/ozbeksu/samarkand-api/ent/authentication"
 	"github.com/ozbeksu/samarkand-api/ent/bookmark"
 	"github.com/ozbeksu/samarkand-api/ent/comment"
 	"github.com/ozbeksu/samarkand-api/ent/community"
 	"github.com/ozbeksu/samarkand-api/ent/content"
 	"github.com/ozbeksu/samarkand-api/ent/group"
 	"github.com/ozbeksu/samarkand-api/ent/message"
+	"github.com/ozbeksu/samarkand-api/ent/messagerecipient"
+	"github.com/ozbeksu/samarkand-api/ent/messagesender"
 	"github.com/ozbeksu/samarkand-api/ent/notification"
+	"github.com/ozbeksu/samarkand-api/ent/passwordresettoken"
 	"github.com/ozbeksu/samarkand-api/ent/permission"
 	"github.com/ozbeksu/samarkand-api/ent/profile"
 	"github.com/ozbeksu/samarkand-api/ent/tag"
@@ -87,21 +91,25 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			activity.Table:     activity.ValidColumn,
-			attachment.Table:   attachment.ValidColumn,
-			bookmark.Table:     bookmark.ValidColumn,
-			comment.Table:      comment.ValidColumn,
-			community.Table:    community.ValidColumn,
-			content.Table:      content.ValidColumn,
-			group.Table:        group.ValidColumn,
-			message.Table:      message.ValidColumn,
-			notification.Table: notification.ValidColumn,
-			permission.Table:   permission.ValidColumn,
-			profile.Table:      profile.ValidColumn,
-			tag.Table:          tag.ValidColumn,
-			topic.Table:        topic.ValidColumn,
-			user.Table:         user.ValidColumn,
-			vote.Table:         vote.ValidColumn,
+			activity.Table:           activity.ValidColumn,
+			attachment.Table:         attachment.ValidColumn,
+			authentication.Table:     authentication.ValidColumn,
+			bookmark.Table:           bookmark.ValidColumn,
+			comment.Table:            comment.ValidColumn,
+			community.Table:          community.ValidColumn,
+			content.Table:            content.ValidColumn,
+			group.Table:              group.ValidColumn,
+			message.Table:            message.ValidColumn,
+			messagerecipient.Table:   messagerecipient.ValidColumn,
+			messagesender.Table:      messagesender.ValidColumn,
+			notification.Table:       notification.ValidColumn,
+			passwordresettoken.Table: passwordresettoken.ValidColumn,
+			permission.Table:         permission.ValidColumn,
+			profile.Table:            profile.ValidColumn,
+			tag.Table:                tag.ValidColumn,
+			topic.Table:              topic.ValidColumn,
+			user.Table:               user.ValidColumn,
+			vote.Table:               vote.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -4,12 +4,18 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"time"
 )
 
 // Attachment holds the schema definition for the Attachment entity.
 type Attachment struct {
 	ent.Schema
+}
+
+// Mixin of the Attachment.
+func (Attachment) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
 }
 
 // Fields of the Attachment.
@@ -21,8 +27,6 @@ func (Attachment) Fields() []ent.Field {
 		field.String("url"),
 		field.Int("width").Optional(),
 		field.Int("height").Optional(),
-		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 

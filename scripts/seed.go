@@ -65,6 +65,8 @@ func seed() {
 	comments := makeSubComments(10, len(users), len(communities), len(tags), 1, len(treads))
 	subComments := makeSubComments(20, len(users), len(communities), len(tags), len(treads), len(treads)+len(comments))
 
+	makeMessages(3, len(users), len(communities))
+
 	fmt.Printf("%d done", len(comments)+len(treads)+len(subComments))
 }
 

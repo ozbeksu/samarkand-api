@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"time"
 )
 
 // Profile holds the schema definition for the Profile entity.
@@ -12,17 +11,24 @@ type Profile struct {
 	ent.Schema
 }
 
+// Mixin of the User.
+func (Profile) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		TimeMixin{},
+	}
+}
+
 // Fields of the Profile.
 func (Profile) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("first_name").Optional(),
 		field.String("last_name").Optional(),
-		field.String("about").Optional(),
+		field.String("bio").Optional(),
+		field.String("location").Optional(),
+		field.Time("date_of_birth").Optional(),
 		field.Int("avatar_id").Optional(),
 		field.Int("cover_id").Optional(),
 		field.Int("user_id"),
-		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 
